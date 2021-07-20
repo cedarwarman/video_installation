@@ -1,32 +1,34 @@
 #!/usr/env/bin python3
 
-from time import sleep
+# Adapted from:
+# https://stackoverflow.com/questions/67010182/python-script-wont-open-youtube-stream-in-vlc
 
-# importing vlc module
-import vlc
-
-# importing pafy module
 import pafy
+import vlc
+import sys
 
-# url of the video
 url = "https://www.youtube.com/watch?v=M9FSDdGLMh8"
 
-# creating pafy object of the video
 video = pafy.new(url)
-
-print(video.title)
-
-# getting best stream
 best = video.getbest()
-#print(best.url)
-
-# creating vlc media player object
+i = vlc.Instance()
 media = vlc.MediaPlayer(best.url)
-#media_player = vlc.MediaPlayer()
 
-#media_player.set_media(best.url)
+media.toggle_fullscreen()
 
-# start playing video
-media.play()
+if sys.platform == "darwin":
+    from PyQt6 import QtCore
+    from PyQt6 import QtGui
+    from PyQt6 import QtWidgets
+    
+    print("building app")
 
-sleep(100)
+    vlcApp =QtWidgets.QApplication(sys.argv)
+    vlcWidget = QtWidgets.QFrame()
+    vlcWidget.resize(700, 700)
+    vlcWidget.showFullScreen()
+    media.set_nsobject(int(vlcWidget.winId()))
+    print("Playing media")
+    media.play()
+    vlcApp.exec()
+
